@@ -6,6 +6,8 @@ exports.execute = () => {
     name: 'Federico',
     surname: 'Casares',
     email: 'federico.casares@wolox.com.ar',
-    password: '12345678'
+    password: '$2b$10$FoKOu6OIHD20/6C8E86YjueiahPtZwSxLFRJJucC7o0wY3bkVmXHS',
+    updatedAt: '2018-10-24T18:51:59.125Z',
+    createdAt: '2018-10-24T18:51:59.125Z'
   });
 };

@@ -30,4 +30,23 @@ exports.init = app => {
     ],
     userController.userCreate
   );
+
+  app.post(
+    '/users/sessions',
+    [
+      check('password')
+        .isLength({ min: 8 })
+        .withMessage('Password must contain more than 8 characters.'),
+      check('email')
+        .isEmail()
+        .withMessage('Invalid email.')
+        .custom(email => {
+          if (!email.endsWith('wolox.com.ar')) {
+            throw new Error('Email is not from wolox domain!');
+          }
+          return true;
+        })
+    ],
+    userController.userNewSession
+  );
 };
