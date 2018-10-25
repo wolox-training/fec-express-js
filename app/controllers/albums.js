@@ -1,5 +1,7 @@
 const logger = require('../logger');
 const axios = require('axios');
+const { Purchase } = require('../models');
+const { albumAlreadyPurchased, defaultError } = require('../errors');
 
 module.exports = {
   list(req, res, next) {
@@ -11,5 +13,26 @@ module.exports = {
         })
       });
     });
+  },
+
+  buy(req, res, next) {
+    const purchase = {
+      userId: req.user.id,
+      albumId: req.params.id
+    };
+    Purchase.findOne({ where: purchase })
+      .then(p => {
+        if (p) {
+          next(albumAlreadyPurchased);
+        } else {
+          return Purchase.create(purchase);
+        }
+      })
+      .then(p => {
+        res.status(200).json(p);
+      })
+      .catch(err => {
+        next(defaultError(err.message));
+      });
   }
 };

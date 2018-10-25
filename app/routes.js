@@ -59,4 +59,5 @@ exports.init = app => {
   );
 
   app.get('/albums', [jwt({ secret: config.secret })], albumController.list);
+  app.post('/albums/:id', [jwt({ secret: config.secret })], albumController.buy);
 };

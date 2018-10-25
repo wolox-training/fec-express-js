@@ -54,3 +54,58 @@ describe('/albums GET', () => {
       });
   });
 });
+
+describe('/albums/:id POST', () => {
+  it('should create a purchase', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        chai
+          .request(server)
+          .post('/albums/1')
+          .set('authorization', `Bearer ${response.body.token}`)
+          .end((err, res) => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.a.json;
+            expect(err).to.be.null;
+            expect(res.body).to.have.property('userId');
+            expect(res.body).to.have.property('albumId');
+            dictum.chai(res, 'Album purchase endpoint');
+            done();
+          });
+      });
+  });
+
+  it('should fail if purchase exists already', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        chai
+          .request(server)
+          .post('/albums/1')
+          .set('authorization', `Bearer ${response.body.token}`)
+          .then(r => {
+            chai
+              .request(server)
+              .post('/albums/1')
+              .set('authorization', `Bearer ${response.body.token}`)
+              .end((err, res) => {
+                expect(res).to.have.status(500);
+                expect(res).to.be.a.json;
+                expect(err).not.to.be.null;
+                done();
+              });
+          });
+      });
+  });
+});
