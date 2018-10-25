@@ -10,13 +10,14 @@
   "content-type": "application/json",
   "content-length": 106
 }</pre><h5>Body</h5><pre>{
-  "id": 2,
+  "id": 3,
   "name": "Juan Ignacio",
   "surname": "Molina",
   "email": "juanignacio.molina@wolox.com.ar",
-  "password": "$2b$10$D2kceboDas2yXm2SSPADE.cEkyLLQPUa4.GghV9nFr89hwwxjHmze",
-  "updatedAt": "2018-10-24T20:40:53.069Z",
-  "createdAt": "2018-10-24T20:40:53.069Z"
+  "password": "$2b$10$ihGcY0Pfe3f8D94JubDGtegYHcyShEdyqJVAnuHNwabIZLRb8Ey86",
+  "admin": false,
+  "updatedAt": "2018-10-25T13:39:43.791Z",
+  "createdAt": "2018-10-25T13:39:43.791Z"
 }</pre></div></div></div></div><div class="panel panel-default"><div class="panel-heading" role="tab" id="heading-users-sessions-POST"><h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapse-users-sessions-POST" href="#collapse-users-sessions-POST">POST /users/sessions</a></h4></div><div id="collapse-users-sessions-POST" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-users-sessions-POST"><div class="panel-body"><h4>Request Data</h4><div class="container"><h5>Headers</h5><pre>{
   "content-type": "application/json",
   "content-length": 63
@@ -27,11 +28,11 @@
   "content-type": "application/json",
   "content-length": 63
 }</pre><h5>Body</h5><pre>{
-  "token": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwibmFtZSI6IkZlZGVyaWNvIiwic3VybmFtZSI6IkNhc2FyZXMiLCJlbWFpbCI6ImZlZGVyaWNvLmNhc2FyZXNAd29sb3guY29tLmFyIiwicGFzc3dvcmQiOiIkMmIkMTAkRm9LT3U2T0lIRDIwLzZDOEU4NllqdWVpYWhQdFp3U3hMRlJKSnVjQzdvMHdZM2JrVm1YSFMiLCJjcmVhdGVkQXQiOiIyMDE4LTEwLTI0VDE4OjUxOjU5LjEyNVoiLCJ1cGRhdGVkQXQiOiIyMDE4LTEwLTI0VDIwOjQwOjUzLjQxM1oifQ.93Xsv8i9hlhGfgsr1S6Nx5mOhB2hk2ostxZoye4KoHc"
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwibmFtZSI6IkZlZGVyaWNvIiwic3VybmFtZSI6IkNhc2FyZXMiLCJlbWFpbCI6ImZlZGVyaWNvLmNhc2FyZXNAd29sb3guY29tLmFyIiwicGFzc3dvcmQiOiIkMmIkMTAkRm9LT3U2T0lIRDIwLzZDOEU4NllqdWVpYWhQdFp3U3hMRlJKSnVjQzdvMHdZM2JrVm1YSFMiLCJhZG1pbiI6dHJ1ZSwiY3JlYXRlZEF0IjoiMjAxOC0xMC0yNFQxODo1MTo1OS4xMjVaIiwidXBkYXRlZEF0IjoiMjAxOC0xMC0yNVQxMzozOTo0NC4yMTZaIn0.mkud6S-Aggk-7jXIL1InZfBVFwto4u1AZUudV0rTrr4"
 }</pre></div></div></div></div><div class="panel panel-default"><div class="panel-heading" role="tab" id="heading-users-GET"><h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapse-users-GET" href="#collapse-users-GET">GET /users</a></h4></div><div id="collapse-users-GET" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-users-GET"><div class="panel-body"><h4>Request Data</h4><div class="container"><h5>Headers</h5><pre>{
-  "authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwibmFtZSI6IkZlZGVyaWNvIiwic3VybmFtZSI6IkNhc2FyZXMiLCJlbWFpbCI6ImZlZGVyaWNvLmNhc2FyZXNAd29sb3guY29tLmFyIiwicGFzc3dvcmQiOiIkMmIkMTAkRm9LT3U2T0lIRDIwLzZDOEU4NllqdWVpYWhQdFp3U3hMRlJKSnVjQzdvMHdZM2JrVm1YSFMiLCJjcmVhdGVkQXQiOiIyMDE4LTEwLTI0VDE4OjUxOjU5LjEyNVoiLCJ1cGRhdGVkQXQiOiIyMDE4LTEwLTI0VDIwOjQwOjUzLjcxOFoifQ.4BXALS6VYA_GRAWfaXlVbcn-ZXfcLxwb8uw6d9Ncahw"
+  "authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwibmFtZSI6IkZlZGVyaWNvIiwic3VybmFtZSI6IkNhc2FyZXMiLCJlbWFpbCI6ImZlZGVyaWNvLmNhc2FyZXNAd29sb3guY29tLmFyIiwicGFzc3dvcmQiOiIkMmIkMTAkRm9LT3U2T0lIRDIwLzZDOEU4NllqdWVpYWhQdFp3U3hMRlJKSnVjQzdvMHdZM2JrVm1YSFMiLCJhZG1pbiI6dHJ1ZSwiY3JlYXRlZEF0IjoiMjAxOC0xMC0yNFQxODo1MTo1OS4xMjVaIiwidXBkYXRlZEF0IjoiMjAxOC0xMC0yNVQxMzozOTo0NC41MzNaIn0.XN_5TUj_0az-wLwFCHsPgtQAI9pnzq7iR0F1XaLl3Ps"
 }</pre></div></div><div class="panel-body"><h4>Response Data</h4><div class="container"><h5>Status: 200</h5><h5>Headers</h5><pre>{
-  "authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwibmFtZSI6IkZlZGVyaWNvIiwic3VybmFtZSI6IkNhc2FyZXMiLCJlbWFpbCI6ImZlZGVyaWNvLmNhc2FyZXNAd29sb3guY29tLmFyIiwicGFzc3dvcmQiOiIkMmIkMTAkRm9LT3U2T0lIRDIwLzZDOEU4NllqdWVpYWhQdFp3U3hMRlJKSnVjQzdvMHdZM2JrVm1YSFMiLCJjcmVhdGVkQXQiOiIyMDE4LTEwLTI0VDE4OjUxOjU5LjEyNVoiLCJ1cGRhdGVkQXQiOiIyMDE4LTEwLTI0VDIwOjQwOjUzLjcxOFoifQ.4BXALS6VYA_GRAWfaXlVbcn-ZXfcLxwb8uw6d9Ncahw"
+  "authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwibmFtZSI6IkZlZGVyaWNvIiwic3VybmFtZSI6IkNhc2FyZXMiLCJlbWFpbCI6ImZlZGVyaWNvLmNhc2FyZXNAd29sb3guY29tLmFyIiwicGFzc3dvcmQiOiIkMmIkMTAkRm9LT3U2T0lIRDIwLzZDOEU4NllqdWVpYWhQdFp3U3hMRlJKSnVjQzdvMHdZM2JrVm1YSFMiLCJhZG1pbiI6dHJ1ZSwiY3JlYXRlZEF0IjoiMjAxOC0xMC0yNFQxODo1MTo1OS4xMjVaIiwidXBkYXRlZEF0IjoiMjAxOC0xMC0yNVQxMzozOTo0NC41MzNaIn0.XN_5TUj_0az-wLwFCHsPgtQAI9pnzq7iR0F1XaLl3Ps"
 }</pre><h5>Body</h5><pre>{
   "users": [
     {
@@ -39,8 +40,18 @@
       "name": "Federico",
       "surname": "Casares",
       "email": "federico.casares@wolox.com.ar",
+      "admin": true,
       "createdAt": "2018-10-24T18:51:59.125Z",
-      "updatedAt": "2018-10-24T20:40:53.718Z"
+      "updatedAt": "2018-10-25T13:39:44.533Z"
+    },
+    {
+      "id": 2,
+      "name": "Federico",
+      "surname": "NotAdmin",
+      "email": "federico.notadmin@wolox.com.ar",
+      "admin": false,
+      "createdAt": "2018-10-24T18:51:59.125Z",
+      "updatedAt": "2018-10-25T13:39:44.543Z"
     }
   ],
   "page": 1

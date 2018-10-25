@@ -5,6 +5,23 @@ const { User } = require('../models');
 const logger = require('../logger');
 const config = require('../../config').common.session;
 
+function logDBError(res) {
+  return error => {
+    logger.error(`DB: ${error.errors[0]}`);
+    res.status(500).json({ error: error.errors[0].message });
+  };
+}
+
+function createUser(userParams, res) {
+  userParams.password = bcrypt.hashSync(userParams.password, 10);
+  User.create(userParams)
+    .then(user => {
+      logger.info(`User ${user.name} successfuly created!`);
+      res.status(200).json(user);
+    })
+    .catch(logDBError(res));
+}
+
 module.exports = {
   userCreate(req, res, next) {
     const errors = validationResult(req);
@@ -14,16 +31,8 @@ module.exports = {
       return res.status(422).json({ errors: errors.array() });
     }
     const userRaw = req.body;
-    userRaw.password = bcrypt.hashSync(userRaw.password, 10);
-    User.create(userRaw)
-      .then(user => {
-        logger.info(`User ${user.name} successfuly created!`);
-        res.status(200).json(user);
-      })
-      .catch(error => {
-        logger.error(`DB: ${error.errors[0]}`);
-        res.status(500).json({ error: error.errors[0].message });
-      });
+    userRaw.admin = false;
+    createUser(userRaw, res);
   },
 
   userNewSession(req, res, next) {
@@ -50,10 +59,7 @@ module.exports = {
           return res.status(401).json({ error: 'User auth failed. Check your email or password.' });
         }
       })
-      .catch(error => {
-        logger.error(`DB: ${error.errors[0]}`);
-        res.status(500).json({ error: error.errors[0].message });
-      });
+      .catch(logDBError(res));
   },
   usersList(req, res, next) {
     let page = parseInt(req.query.page) || 1;
@@ -63,9 +69,34 @@ module.exports = {
       .then(users => {
         res.status(200).json({ users, page });
       })
-      .catch(error => {
-        logger.error(`DB: ${error.errors[0]}`);
-        res.status(500).json({ error: error.errors[0].message });
-      });
+      .catch(logDBError(res));
+  },
+  userAdminCreate(req, res, next) {
+    const errors = validationResult(req);
+    // TODO: Move to middleware
+    if (!errors.isEmpty()) {
+      logger.error('User input invalid.');
+      logger.error(errors.array());
+      return res.status(422).json({ errors: errors.array() });
+    }
+    // TODO: Move to middleware
+    if (!req.user.admin) {
+      return res.status(401).json({ message: 'User is not an admin.' });
+    }
+    const userRaw = req.body;
+    User.findOne({ where: { email: userRaw.email } })
+      .then(user => {
+        if (user) {
+          return User.update({ admin: true }, { returning: true, where: { email: userRaw.email } })
+            .then(function([rowsUpdate, [userUpdated]]) {
+              res.status(200).json(userUpdated);
+            })
+            .catch(logDBError(res));
+        } else {
+          userRaw.admin = true;
+          createUser(userRaw, res);
+        }
+      })
+      .catch(logDBError(res));
   }
 };

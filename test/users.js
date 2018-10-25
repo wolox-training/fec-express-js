@@ -298,3 +298,90 @@ describe('/users GET', () => {
       });
   });
 });
+
+describe('/admin/users POST', () => {
+  it('should create user admin successfuly', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        chai
+          .request(server)
+          .post('/admin/users')
+          .set('authorization', `Bearer ${response.body.token}`)
+          .send({
+            name: 'Juan Ignacio',
+            surname: 'Molina',
+            email: 'juanignacio.molina@wolox.com.ar',
+            password: 'pussy123'
+          })
+          .end((err, res) => {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            expect(res).to.be.a.json;
+            dictum.chai(res, 'User Admin signup endpoint');
+            done();
+          });
+      });
+  });
+
+  it('should update user admin successfuly', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        chai
+          .request(server)
+          .post('/admin/users')
+          .set('authorization', `Bearer ${response.body.token}`)
+          .send({
+            name: 'Federico',
+            surname: 'Casares',
+            email: 'federico.casares@wolox.com.ar',
+            password: 'noImporta'
+          })
+          .end((err, res) => {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            expect(res).to.be.a.json;
+            done();
+          });
+      });
+  });
+
+  it('should fail if not admin', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.notadmin@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        chai
+          .request(server)
+          .post('/admin/users')
+          .set('authorization', `Bearer ${response.body.token}`)
+          .send({
+            name: 'Federico',
+            surname: 'Casares',
+            email: 'federico.casares@wolox.com.ar',
+            password: 'noImporta'
+          })
+          .end((err, res) => {
+            expect(err).not.to.be.null;
+            expect(res).to.have.status(401);
+            expect(res).to.be.a.json;
+            done();
+          });
+      });
+  });
+});

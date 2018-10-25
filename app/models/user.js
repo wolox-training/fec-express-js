@@ -18,6 +18,11 @@ module.exports = function(sequelize, DateTypes) {
       password: {
         type: DateTypes.STRING,
         allowNull: false
+      },
+      admin: {
+        type: DateTypes.BOOLEAN,
+        default: false,
+        allowNull: false
       }
     },
     {
