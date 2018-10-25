@@ -2,8 +2,10 @@ const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { User, Purchase } = require('../models');
+const axios = require('axios');
 const logger = require('../logger');
 const config = require('../../config').common.session;
+const { defaultError } = require('../errors');
 
 function logDBError(res) {
   return error => {
@@ -109,6 +111,28 @@ module.exports = {
           return { id: p.albumId };
         })
       });
+    });
+  },
+  albumPhotosList(req, res, next) {
+    const purchase = {
+      userId: req.user.id,
+      albumId: req.params.id
+    };
+    Purchase.findOne({ where: purchase }).then(p => {
+      if (!p) {
+        next(defaultError('Album has not been purchased.'));
+      } else {
+        axios
+          .get(`https://jsonplaceholder.typicode.com/photos?albumId=${p.albumId}`)
+          .then(function(response) {
+            res.status(200).json({
+              photos: response.data.map(photo => {
+                delete photo.albumId;
+                return photo;
+              })
+            });
+          });
+      }
     });
   }
 };

@@ -1,7 +1,9 @@
 const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
-  expect = chai.expect;
+  expect = chai.expect,
+  nock = require('nock'),
+  { Purchase } = require('../app/models');
 
 describe('/users POST', () => {
   it('should signup successfuly', () => {
@@ -450,6 +452,67 @@ describe('/users/:id/albums GET', () => {
             expect(res).to.be.a.json;
             expect(err).not.to.be.null;
             dictum.chai(res, 'User albums list endpoint');
+            done();
+          });
+      });
+  });
+});
+
+describe('/users/albums/:id/photos GET', () => {
+  it('should list album photos of one of my albums', done => {
+    const photoRequest = nock('https://jsonplaceholder.typicode.com/')
+      .get('/photos?albumId=7')
+      .reply(
+        200,
+        `[
+            {
+              "albumId": 1,
+              "id": 1,
+              "title": "accusamus beatae ad facilis cum similique qui sunt",
+              "url": "https://via.placeholder.com/600/92c952",
+              "thumbnailUrl": "https://via.placeholder.com/150/92c952"
+            }
+          ]`
+      );
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        return chai
+          .request(server)
+          .get('/users/albums/7/photos')
+          .set('authorization', `Bearer ${response.body.token}`);
+      })
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.a.json;
+        expect(res.body).to.have.property('photos');
+        photoRequest.isDone();
+        dictum.chai(res, 'User album photos list endpoint');
+        done();
+      });
+  });
+  it('should fail to list album photos if not one of my albums', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        chai
+          .request(server)
+          .get('/users/albums/1/photos')
+          .set('authorization', `Bearer ${response.body.token}`)
+          .end((err, res) => {
+            expect(res).to.have.status(500);
+            expect(res).to.be.a.json;
+            expect(err).not.to.be.null;
             done();
           });
       });
