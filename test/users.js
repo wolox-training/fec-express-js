@@ -384,3 +384,74 @@ describe('/admin/users POST', () => {
       });
   });
 });
+
+describe('/users/:id/albums GET', () => {
+  it('should list albums of my own', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        chai
+          .request(server)
+          .get('/users/1/albums')
+          .set('authorization', `Bearer ${response.body.token}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.a.json;
+            expect(res.body).to.have.property('albums');
+            dictum.chai(res, 'User albums list endpoint');
+            done();
+          });
+      });
+  });
+
+  it('should list albums of other user with admin rights', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        chai
+          .request(server)
+          .get('/users/2/albums')
+          .set('authorization', `Bearer ${response.body.token}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.a.json;
+            expect(res.body).to.have.property('albums');
+            dictum.chai(res, 'User albums list endpoint');
+            done();
+          });
+      });
+  });
+
+  it('should fail to list albums of other user without admin rights', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.notadmin@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        chai
+          .request(server)
+          .get('/users/1/albums')
+          .set('authorization', `Bearer ${response.body.token}`)
+          .end((err, res) => {
+            expect(res).to.have.status(401);
+            expect(res).to.be.a.json;
+            expect(err).not.to.be.null;
+            dictum.chai(res, 'User albums list endpoint');
+            done();
+          });
+      });
+  });
+});

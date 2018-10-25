@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const { User, Purchase } = require('../models');
 const logger = require('../logger');
 const config = require('../../config').common.session;
 
@@ -98,5 +98,17 @@ module.exports = {
         }
       })
       .catch(logDBError(res));
+  },
+  albumList(req, res, next) {
+    if (!req.user.admin && req.user.id !== parseInt(req.params.id)) {
+      return res.status(401).json({ message: 'User is not an admin.' });
+    }
+    Purchase.findAll({ where: { userId: req.params.id } }).then(purchases => {
+      res.status(200).json({
+        albums: purchases.map(p => {
+          return { id: p.albumId };
+        })
+      });
+    });
   }
 };
