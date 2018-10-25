@@ -1,7 +1,6 @@
 const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
-  should = chai.should(),
   expect = chai.expect;
 
 describe('/users POST', () => {
