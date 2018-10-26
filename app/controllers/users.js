@@ -54,14 +54,18 @@ module.exports = {
         }
         if (bcrypt.compareSync(password, user.password)) {
           logger.info(`User ${email} authenticated.`);
-          const token = jwt.sign(JSON.stringify(user), config.secret);
-          return res.status(200).json({ token });
+          const token = jwt.sign(JSON.parse(JSON.stringify(user)), config.secret, {
+            expiresIn: config.expirationInSeconds
+          });
+          return res
+            .status(200)
+            .json({ token, expirationDate: Math.floor(Date.now() / 1000) + config.expirationInSeconds });
         } else {
           logger.error('Password mismatch.');
           return res.status(401).json({ error: 'User auth failed. Check your email or password.' });
         }
       })
-      .catch(logDBError(res));
+      .catch(next);
   },
   usersList(req, res, next) {
     let page = parseInt(req.query.page) || 1;

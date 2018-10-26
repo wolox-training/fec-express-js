@@ -2,8 +2,10 @@ const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
   expect = chai.expect,
+  jwt = require('jsonwebtoken'),
   nock = require('nock'),
-  { Purchase } = require('../app/models');
+  config = require('../config').common,
+  { User, Purchase } = require('../app/models');
 
 describe('/users POST', () => {
   it('should signup successfuly', () => {
@@ -177,6 +179,7 @@ describe('/users/sessions POST', () => {
         expect(res).to.have.status(200);
         expect(res).to.be.a.json;
         expect(res.body).to.have.property('token');
+        expect(res.body).to.have.property('expirationDate');
         dictum.chai(res, 'User signin endpoint');
       });
   });
@@ -286,6 +289,27 @@ describe('/users GET', () => {
         expect(res).to.have.status(500);
         done();
       });
+  });
+
+  it('should fail if token expired', done => {
+    User.findOne().then(user => {
+      const token = jwt.sign(JSON.parse(JSON.stringify(user)), config.session.secret, {
+        expiresIn: 0
+      });
+      chai
+        .request(server)
+        .get('/users')
+        .set('authorization', `Bearer ${token}`)
+        .end((err, res) => {
+          expect(err).not.to.be.null;
+          expect(res).to.have.status(500);
+          expect(res).to.be.a.json;
+          expect(res.body)
+            .to.have.property('message')
+            .equals('jwt expired');
+          done();
+        });
+    });
   });
 
   it('should fail if no token', done => {
