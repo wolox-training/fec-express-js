@@ -32,6 +32,9 @@ module.exports = {
         defaultValue: false,
         allowNull: false
       },
+      sessionInvalidate: {
+        type: Sequelize.BIGINT
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

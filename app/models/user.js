@@ -23,6 +23,9 @@ module.exports = function(sequelize, DateTypes) {
         type: DateTypes.BOOLEAN,
         default: false,
         allowNull: false
+      },
+      sessionInvalidate: {
+        type: DateTypes.BIGINT
       }
     },
     {

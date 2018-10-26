@@ -1,8 +1,7 @@
 const { check } = require('express-validator/check');
-const jwt = require('express-jwt');
 const userController = require('./controllers/users');
 const albumController = require('./controllers/albums');
-const config = require('../config').common.session;
+const { tokenCheck } = require('./middlewares/validations');
 
 exports.init = app => {
   // app.get('/endpoint/get/path', [], controller.methodGET);
@@ -50,16 +49,12 @@ exports.init = app => {
     userController.userNewSession
   );
 
-  app.get('/users', [jwt({ secret: config.secret })], userController.usersList);
-  app.get('/users/:id/albums', [jwt({ secret: config.secret })], userController.albumList);
-  app.get('/users/albums/:id/photos', [jwt({ secret: config.secret })], userController.albumPhotosList);
+  app.post('/users/sessions/invalidate_all', [tokenCheck], userController.invalidateAllSessions);
+  app.get('/users', [tokenCheck], userController.usersList);
+  app.get('/users/:id/albums', [tokenCheck], userController.albumList);
+  app.get('/users/albums/:id/photos', [tokenCheck], userController.albumPhotosList);
+  app.post('/admin/users', [tokenCheck].concat(userValidations), userController.userAdminCreate);
 
-  app.post(
-    '/admin/users',
-    [jwt({ secret: config.secret })].concat(userValidations),
-    userController.userAdminCreate
-  );
-
-  app.get('/albums', [jwt({ secret: config.secret })], albumController.list);
-  app.post('/albums/:id', [jwt({ secret: config.secret })], albumController.buy);
+  app.get('/albums', [tokenCheck], albumController.list);
+  app.post('/albums/:id', [tokenCheck], albumController.buy);
 };
