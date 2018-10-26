@@ -6,6 +6,9 @@ const DEFAULT_STATUS_CODE = 500;
 const statusCodes = {
   [errors.INVALID_USER]: 400,
   [errors.BOOK_NOT_FOUND]: 404,
+  [errors.USER_UNAUTHORIZED]: 401,
+  [errors.NEEDS_ADMIN]: 401,
+  [errors.INVALID_INPUT]: 422,
   [errors.SAVING_ERROR]: 400,
   [errors.DATABASE_ERROR]: 503,
   [errors.DEFAULT_ERROR]: 500,

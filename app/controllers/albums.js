@@ -1,18 +1,21 @@
 const logger = require('../logger');
 const axios = require('axios');
 const { Purchase } = require('../models');
-const { albumAlreadyPurchased, defaultError } = require('../errors');
+const { albumAlreadyPurchased, defaultError, dbError } = require('../errors');
 
 module.exports = {
   list(req, res, next) {
-    axios.get('https://jsonplaceholder.typicode.com/albums').then(function(response) {
-      res.status(200).json({
-        albums: response.data.map(album => {
-          delete album.userId;
-          return album;
-        })
-      });
-    });
+    axios
+      .get('https://jsonplaceholder.typicode.com/albums')
+      .then(function(response) {
+        res.status(200).json({
+          albums: response.data.map(album => {
+            delete album.userId;
+            return album;
+          })
+        });
+      })
+      .catch(err => next(defaultError('External API error.')));
   },
 
   buy(req, res, next) {
@@ -31,8 +34,6 @@ module.exports = {
       .then(p => {
         res.status(200).json(p);
       })
-      .catch(err => {
-        next(defaultError(err.message));
-      });
+      .catch(err => next(dbError(err)));
   }
 };

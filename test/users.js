@@ -38,10 +38,7 @@ describe('/users POST', () => {
       .end((err, res) => {
         expect(res).to.have.status(422);
         expect(err).not.to.be.null;
-        expect(res.body).to.have.property('errors');
-        expect(res.body.errors[0])
-          .to.have.property('param')
-          .equals('email');
+        expect(res.body).to.have.property('message');
         done();
       });
   });
@@ -59,10 +56,7 @@ describe('/users POST', () => {
       .end((err, res) => {
         expect(res).to.have.status(422);
         expect(err).not.to.be.null;
-        expect(res.body).to.have.property('errors');
-        expect(res.body.errors[0])
-          .to.have.property('param')
-          .equals('password');
+        expect(res.body).to.have.property('message');
         done();
       });
   });
@@ -79,10 +73,7 @@ describe('/users POST', () => {
       .end((err, res) => {
         expect(res).to.have.status(422);
         expect(err).not.to.be.null;
-        expect(res.body).to.have.property('errors');
-        expect(res.body.errors[0])
-          .to.have.property('param')
-          .equals('name');
+        expect(res.body).to.have.property('message');
         done();
       });
   });
@@ -99,10 +90,7 @@ describe('/users POST', () => {
       .end((err, res) => {
         expect(res).to.have.status(422);
         expect(err).not.to.be.null;
-        expect(res.body).to.have.property('errors');
-        expect(res.body.errors[0])
-          .to.have.property('param')
-          .equals('password');
+        expect(res.body).to.have.property('message');
         done();
       });
   });
@@ -119,10 +107,7 @@ describe('/users POST', () => {
       .end((err, res) => {
         expect(res).to.have.status(422);
         expect(err).not.to.be.null;
-        expect(res.body).to.have.property('errors');
-        expect(res.body.errors[0])
-          .to.have.property('param')
-          .equals('surname');
+        expect(res.body).to.have.property('message');
         done();
       });
   });
@@ -139,10 +124,7 @@ describe('/users POST', () => {
       .end((err, res) => {
         expect(res).to.have.status(422);
         expect(err).not.to.be.null;
-        expect(res.body).to.have.property('errors');
-        expect(res.body.errors[0])
-          .to.have.property('param')
-          .equals('email');
+        expect(res.body).to.have.property('message');
         done();
       });
   });
@@ -158,9 +140,9 @@ describe('/users POST', () => {
         password: '12345678'
       })
       .end((err, res) => {
-        expect(res).to.have.status(500);
+        expect(res).to.have.status(503);
         expect(err).not.to.be.null;
-        expect(res.body).to.have.property('error');
+        expect(res.body).to.have.property('message');
         done();
       });
   });
@@ -208,10 +190,7 @@ describe('/users/sessions POST', () => {
       })
       .end((err, res) => {
         expect(res).to.have.status(422);
-        expect(res.body).to.have.property('errors');
-        expect(res.body.errors[0])
-          .to.have.property('param')
-          .equals('password');
+        expect(res.body).to.have.property('message');
         expect(err).not.to.be.null;
         done();
       });
@@ -226,10 +205,7 @@ describe('/users/sessions POST', () => {
       })
       .end((err, res) => {
         expect(res).to.have.status(422);
-        expect(res.body).to.have.property('errors');
-        expect(res.body.errors[0])
-          .to.have.property('param')
-          .equals('email');
+        expect(res.body).to.have.property('message');
         expect(err).not.to.be.null;
         done();
       });
@@ -245,10 +221,7 @@ describe('/users/sessions POST', () => {
       })
       .end((err, res) => {
         expect(res).to.have.status(422);
-        expect(res.body).to.have.property('errors');
-        expect(res.body.errors[0])
-          .to.have.property('param')
-          .equals('email');
+        expect(res.body).to.have.property('message');
         expect(err).not.to.be.null;
         done();
       });

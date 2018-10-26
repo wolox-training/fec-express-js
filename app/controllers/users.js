@@ -1,56 +1,36 @@
-const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { User, Purchase } = require('../models');
 const axios = require('axios');
 const logger = require('../logger');
 const config = require('../../config').common.session;
-const { defaultError } = require('../errors');
+const { dbError, userUnauthorized, needsAdmin, albumNotPurchased } = require('../errors');
 
-function logDBError(res) {
-  return error => {
-    logger.error(`DB: ${error.errors[0]}`);
-    res.status(500).json({ error: error.errors[0].message });
-  };
-}
-
-function createUser(userParams, res) {
+function createUser(userParams, res, next) {
   userParams.password = bcrypt.hashSync(userParams.password, 10);
   User.create(userParams)
     .then(user => {
       logger.info(`User ${user.name} successfuly created!`);
       res.status(200).json(user);
     })
-    .catch(logDBError(res));
+    .catch(err => next(dbError(err)));
 }
 
 module.exports = {
   userCreate(req, res, next) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      logger.error('User input invalid.');
-      logger.error(errors.array());
-      return res.status(422).json({ errors: errors.array() });
-    }
     const userRaw = req.body;
     userRaw.admin = false;
-    createUser(userRaw, res);
+    createUser(userRaw, res, next);
   },
 
   userNewSession(req, res, next) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      logger.error('User input invalid.');
-      logger.error(errors.array());
-      return res.status(422).json({ errors: errors.array() });
-    }
     const { email, password } = req.body;
     User.scope('withPasswd')
       .findOne({ where: { email } })
       .then(user => {
         if (!user) {
           logger.error('Email is not registered.');
-          return res.status(401).json({ error: 'User auth failed. Check your email or password.' });
+          next(userUnauthorized);
         }
         if (bcrypt.compareSync(password, user.password)) {
           logger.info(`User ${email} authenticated.`);
@@ -62,10 +42,10 @@ module.exports = {
             .json({ token, expirationDate: Math.floor(Date.now() / 1000) + config.expirationInSeconds });
         } else {
           logger.error('Password mismatch.');
-          return res.status(401).json({ error: 'User auth failed. Check your email or password.' });
+          return next(userUnauthorized);
         }
       })
-      .catch(next);
+      .catch(err => next(dbError(err)));
   },
   usersList(req, res, next) {
     let page = parseInt(req.query.page) || 1;
@@ -75,39 +55,28 @@ module.exports = {
       .then(users => {
         res.status(200).json({ users, page });
       })
-      .catch(logDBError(res));
+      .catch(err => next(dbError(err)));
   },
   userAdminCreate(req, res, next) {
-    const errors = validationResult(req);
-    // TODO: Move to middleware
-    if (!errors.isEmpty()) {
-      logger.error('User input invalid.');
-      logger.error(errors.array());
-      return res.status(422).json({ errors: errors.array() });
-    }
-    // TODO: Move to middleware
-    if (!req.user.admin) {
-      return res.status(401).json({ message: 'User is not an admin.' });
-    }
     const userRaw = req.body;
     User.findOne({ where: { email: userRaw.email } })
       .then(user => {
         if (user) {
-          return User.update({ admin: true }, { returning: true, where: { email: userRaw.email } })
+          User.update({ admin: true }, { returning: true, where: { email: userRaw.email } })
             .then(function([rowsUpdate, [userUpdated]]) {
               res.status(200).json(userUpdated);
             })
-            .catch(logDBError(res));
+            .catch(err => next(dbError(err)));
         } else {
           userRaw.admin = true;
-          createUser(userRaw, res);
+          createUser(userRaw, res, next);
         }
       })
-      .catch(logDBError(res));
+      .catch(err => next(dbError(err)));
   },
   albumList(req, res, next) {
     if (!req.user.admin && req.user.id !== parseInt(req.params.id)) {
-      return res.status(401).json({ message: 'User is not an admin.' });
+      return next(needsAdmin);
     }
     Purchase.findAll({ where: { userId: req.params.id } }).then(purchases => {
       res.status(200).json({
@@ -124,7 +93,7 @@ module.exports = {
     };
     Purchase.findOne({ where: purchase }).then(p => {
       if (!p) {
-        next(defaultError('Album has not been purchased.'));
+        next(albumNotPurchased);
       } else {
         axios
           .get(`https://jsonplaceholder.typicode.com/photos?albumId=${p.albumId}`)
