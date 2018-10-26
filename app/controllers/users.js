@@ -42,6 +42,7 @@ module.exports = {
         }
         if (bcrypt.compareSync(password, user.password)) {
           logger.info(`User ${email} authenticated.`);
+          delete user.dataValues.password;
           const token = jwt.sign(JSON.stringify(user), config.secret);
           return res.status(200).json({ secret: token });
         } else {
