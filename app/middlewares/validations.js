@@ -2,7 +2,7 @@ const config = require('../../config').common.session;
 const jwt = require('express-jwt');
 const { validationResult } = require('express-validator/check');
 const { isRevokedCallback } = require('../utils');
-const { invalidInput, needsAdmin } = require('../errors');
+const { invalidInput, needsAdmin, tokenError } = require('../errors');
 const { check } = require('express-validator/check');
 
 const paramValidation = (req, res, next) => {
@@ -15,7 +15,14 @@ const paramValidation = (req, res, next) => {
 };
 
 module.exports = {
-  tokenCheck: jwt({ secret: config.secret, isRevoked: isRevokedCallback }),
+  tokenCheck: [
+    jwt({ secret: config.secret, isRevoked: isRevokedCallback }),
+    (err, req, res, next) => {
+      if (err && err.message) {
+        next(tokenError(err.message));
+      }
+    }
+  ],
   paramValidation,
   checkAdmin(req, res, next) {
     if (!req.user.admin) {

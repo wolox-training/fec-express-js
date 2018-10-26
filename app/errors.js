@@ -23,7 +23,8 @@ exports.dbError = error =>
   internalError(error.errors ? error.errors[0].message : 'Database Error', exports.DATABASE_ERROR);
 
 exports.USER_UNAUTHORIZED = 'user_unauthorized';
-exports.userUnauthorized = internalError('The album was already purchased.', exports.USER_UNAUTHORIZED);
+exports.userUnauthorized = internalError('User is not authorized.', exports.USER_UNAUTHORIZED);
+exports.tokenError = msg => internalError(msg, exports.USER_UNAUTHORIZED);
 
 exports.INVALID_INPUT = 'input_invalid';
 exports.invalidInput = internalError('Input invalid.', exports.INVALID_INPUT);

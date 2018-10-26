@@ -259,7 +259,7 @@ describe('/users GET', () => {
       .set('authorization', `Bearer 1234123`)
       .end((err, res) => {
         expect(err).not.to.be.null;
-        expect(res).to.have.status(500);
+        expect(res).to.have.status(401);
         done();
       });
   });
@@ -275,7 +275,7 @@ describe('/users GET', () => {
         .set('authorization', `Bearer ${token}`)
         .end((err, res) => {
           expect(err).not.to.be.null;
-          expect(res).to.have.status(500);
+          expect(res).to.have.status(401);
           expect(res).to.be.a.json;
           expect(res.body)
             .to.have.property('message')
@@ -291,7 +291,7 @@ describe('/users GET', () => {
       .get('/users')
       .end((err, res) => {
         expect(err).not.to.be.null;
-        expect(res).to.have.status(500);
+        expect(res).to.have.status(401);
         done();
       });
   });
@@ -540,7 +540,7 @@ describe('/users/sessions/invalidate_all POST', () => {
               .post('/users/sessions/invalidate_all')
               .set('authorization', `Bearer ${token}`)
               .end((err, res2) => {
-                expect(res2).to.have.status(500);
+                expect(res2).to.have.status(401);
                 expect(res2).to.be.a.json;
                 expect(res2.body)
                   .to.have.property('message')

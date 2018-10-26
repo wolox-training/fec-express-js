@@ -47,7 +47,7 @@ describe('/albums GET', () => {
       .request(server)
       .get('/albums')
       .end((err, res) => {
-        expect(res).to.have.status(500);
+        expect(res).to.have.status(401);
         expect(res).to.be.a.json;
         expect(err).not.to.be.null;
         done();
