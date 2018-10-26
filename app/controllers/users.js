@@ -57,11 +57,12 @@ module.exports = {
   },
   usersList(req, res, next) {
     let page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.size) || 10;
     page = page > 0 ? page : 1;
-    const pageSize = 10;
-    User.findAll({ offset: pageSize * (page - 1), limit: pageSize })
-      .then(users => {
-        res.status(200).json({ users, page });
+    return User.findAndCountAll({ offset: pageSize * (page - 1), limit: pageSize })
+      .then(result => {
+        const users = result.rows;
+        res.status(200).json({ users, page, count: users.length, total: result.count });
       })
       .catch(error => {
         logger.error(`DB: ${error.errors[0]}`);
