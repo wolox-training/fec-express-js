@@ -31,3 +31,7 @@ exports.invalidInput = internalError('Input invalid.', exports.INVALID_INPUT);
 
 exports.NEEDS_ADMIN = 'needs_admin';
 exports.needsAdmin = internalError('User is not admin.', exports.NEEDS_ADMIN);
+
+exports.EXTERNAL_API_ERROR = 'external_api_error';
+exports.externalApiError = error =>
+  internalError(error.message || 'External Api Error', exports.EXTERNAL_API_ERROR);

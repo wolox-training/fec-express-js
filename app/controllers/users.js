@@ -30,7 +30,7 @@ module.exports = {
       .then(user => {
         if (!user) {
           logger.error('Email is not registered.');
-          next(userUnauthorized);
+          return next(userUnauthorized);
         }
         if (bcrypt.compareSync(password, user.password)) {
           logger.info(`User ${email} authenticated.`);

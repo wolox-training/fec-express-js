@@ -15,11 +15,7 @@ exports.init = app => {
   app.get('/users', [tokenCheck], userController.usersList);
   app.get('/users/:id/albums', [tokenCheck], userController.albumList);
   app.get('/users/albums/:id/photos', [tokenCheck], userController.albumPhotosList);
-  app.post(
-    '/admin/users',
-    [tokenCheck, checkAdmin].concat(userParamsValidations),
-    userController.userAdminCreate
-  );
+  app.post('/admin/users', [tokenCheck, checkAdmin, userParamsValidations], userController.userAdminCreate);
   app.get('/albums', [tokenCheck], albumController.list);
   app.post('/albums/:id', [tokenCheck], albumController.buy);
 };

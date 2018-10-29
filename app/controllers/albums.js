@@ -1,7 +1,7 @@
 const logger = require('../logger');
 const axios = require('axios');
 const { Purchase } = require('../models');
-const { albumAlreadyPurchased, defaultError, dbError } = require('../errors');
+const { albumAlreadyPurchased, defaultError, dbError, externalApiError } = require('../errors');
 
 module.exports = {
   list(req, res, next) {
@@ -15,7 +15,7 @@ module.exports = {
           })
         });
       })
-      .catch(err => next(defaultError('External API error.')));
+      .catch(err => next(externalApiError(err)));
   },
 
   buy(req, res, next) {
