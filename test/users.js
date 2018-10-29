@@ -175,7 +175,7 @@ describe('/users/sessions POST', () => {
       .then(res => {
         expect(res).to.have.status(200);
         expect(res).to.be.a.json;
-        expect(res.body).to.have.property('secret');
+        expect(res.body).to.have.property('token');
         dictum.chai(res, 'User signin endpoint');
       });
   });
@@ -246,6 +246,54 @@ describe('/users/sessions POST', () => {
           .to.have.property('param')
           .equals('email');
         expect(err).not.to.be.null;
+        done();
+      });
+  });
+});
+
+describe('/users GET', () => {
+  it('should list users', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        chai
+          .request(server)
+          .get('/users')
+          .set('authorization', `Bearer ${response.body.token}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.a.json;
+            expect(res.body).to.have.property('users');
+            dictum.chai(res, 'Users list endpoint');
+            done();
+          });
+      });
+  });
+
+  it('should fail if invalid token', done => {
+    chai
+      .request(server)
+      .get('/users')
+      .set('authorization', `Bearer 1234123`)
+      .end((err, res) => {
+        expect(err).not.to.be.null;
+        expect(res).to.have.status(500);
+        done();
+      });
+  });
+
+  it('should fail if no token', done => {
+    chai
+      .request(server)
+      .get('/users')
+      .end((err, res) => {
+        expect(err).not.to.be.null;
+        expect(res).to.have.status(500);
         done();
       });
   });

@@ -34,7 +34,8 @@ module.exports = {
       return res.status(422).json({ errors: errors.array() });
     }
     const { email, password } = req.body;
-    User.findOne({ where: { email } })
+    User.scope('withPasswd')
+      .findOne({ where: { email } })
       .then(user => {
         if (!user) {
           logger.error('Email is not registered.');
@@ -44,11 +45,25 @@ module.exports = {
           logger.info(`User ${email} authenticated.`);
           delete user.dataValues.password;
           const token = jwt.sign(JSON.stringify(user), config.secret);
-          return res.status(200).json({ secret: token });
+          return res.status(200).json({ token });
         } else {
           logger.error('Password mismatch.');
           return res.status(401).json({ error: 'User auth failed. Check your email or password.' });
         }
+      })
+      .catch(error => {
+        logger.error(`DB: ${error.errors[0]}`);
+        res.status(500).json({ error: error.errors[0].message });
+      });
+  },
+  usersList(req, res, next) {
+    let page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.size) || 10;
+    page = page > 0 ? page : 1;
+    return User.findAndCountAll({ offset: pageSize * (page - 1), limit: pageSize })
+      .then(result => {
+        const users = result.rows;
+        res.status(200).json({ users, page, count: users.length, total: result.count });
       })
       .catch(error => {
         logger.error(`DB: ${error.errors[0]}`);

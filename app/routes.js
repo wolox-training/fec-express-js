@@ -1,6 +1,7 @@
 const { check } = require('express-validator/check');
-
+const jwt = require('express-jwt');
 const userController = require('./controllers/users');
+const config = require('../config').common.session;
 
 exports.init = app => {
   // app.get('/endpoint/get/path', [], controller.methodGET);
@@ -49,4 +50,6 @@ exports.init = app => {
     ],
     userController.userNewSession
   );
+
+  app.get('/users', [jwt({ secret: config.secret })], userController.usersList);
 };
