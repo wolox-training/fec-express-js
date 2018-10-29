@@ -10,7 +10,8 @@ module.exports = function(sequelize, DateTypes) {
       },
       albumId: {
         type: DateTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        field: 'album_id'
       },
       date: {
         type: DateTypes.DATE,
@@ -18,11 +19,11 @@ module.exports = function(sequelize, DateTypes) {
       }
     },
     {
-      timestamps: false
+      timestamps: true
     }
   );
   Purchase.associate = function(models) {
-    Purchase.belongsTo(models.User, { as: 'user' });
+    Purchase.belongsTo(models.User, { as: 'user', foreignKey: 'user_id' });
   };
   return Purchase;
 };

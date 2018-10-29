@@ -1,6 +1,6 @@
 const axios = require('axios'),
-  API_URL = 'https://jsonplaceholder.typicode.com',
-  apiClient = axios.create({ baseURL: API_URL });
+  config = require('../../config').common.externalApi,
+  apiClient = axios.create({ baseURL: config.albumApiUrl });
 
 module.exports.getAlbums = () => {
   return apiClient.get('/albums').then(function(response) {
@@ -9,4 +9,8 @@ module.exports.getAlbums = () => {
       return album;
     });
   });
+};
+
+module.exports.getAlbum = id => {
+  return apiClient.get(`/albums/${id}`);
 };

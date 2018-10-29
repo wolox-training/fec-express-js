@@ -2,7 +2,7 @@ const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
   expect = chai.expect,
-  { albumRequest } = require('./mocks');
+  { albumRequest, albumGetRequest } = require('./mocks');
 
 describe('/albums GET', () => {
   it('should list albums', done => {
@@ -46,6 +46,7 @@ describe('/albums GET', () => {
 
 describe('/albums/:id POST', () => {
   it('should create a purchase', done => {
+    const albumRequestMock = albumGetRequest();
     chai
       .request(server)
       .post('/users/sessions')
@@ -62,8 +63,9 @@ describe('/albums/:id POST', () => {
             expect(res).to.have.status(200);
             expect(res).to.be.a.json;
             expect(err).to.be.null;
-            expect(res.body).to.have.property('userId');
+            expect(res.body).to.have.property('user_id');
             expect(res.body).to.have.property('albumId');
+            albumRequestMock.isDone();
             dictum.chai(res, 'Album purchase endpoint');
             done();
           });
@@ -71,6 +73,7 @@ describe('/albums/:id POST', () => {
   });
 
   it('should fail if purchase exists already', done => {
+    const albumRequestMock = albumGetRequest();
     chai
       .request(server)
       .post('/users/sessions')
@@ -92,6 +95,7 @@ describe('/albums/:id POST', () => {
                 expect(res).to.have.status(500);
                 expect(res).to.be.a.json;
                 expect(err).not.to.be.null;
+                albumRequestMock.isDone();
                 done();
               });
           });
