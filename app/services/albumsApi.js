@@ -14,3 +14,12 @@ module.exports.getAlbums = () => {
 module.exports.getAlbum = id => {
   return apiClient.get(`/albums/${id}`);
 };
+
+module.exports.getPhotos = id => {
+  return apiClient.get(`/photos?albumId=${id}`).then(function(response) {
+    return response.data.map(photo => {
+      delete photo.albumId;
+      return photo;
+    });
+  });
+};
