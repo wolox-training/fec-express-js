@@ -162,3 +162,91 @@ describe('/users POST', () => {
       });
   });
 });
+
+describe('/users/sessions POST', () => {
+  it('should signin successfuly', () => {
+    return chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.a.json;
+        expect(res.body).to.have.property('secret');
+        dictum.chai(res, 'User signin endpoint');
+      });
+  });
+
+  it('should fail if wrong password', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: 'notmypass'
+      })
+      .end((err, res) => {
+        expect(res).to.have.status(401);
+        expect(err).not.to.be.null;
+        done();
+      });
+  });
+
+  it('should fail if not password', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar'
+      })
+      .end((err, res) => {
+        expect(res).to.have.status(422);
+        expect(res.body).to.have.property('errors');
+        expect(res.body.errors[0])
+          .to.have.property('param')
+          .equals('password');
+        expect(err).not.to.be.null;
+        done();
+      });
+  });
+
+  it('should fail if not email', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        password: 'notmypass'
+      })
+      .end((err, res) => {
+        expect(res).to.have.status(422);
+        expect(res.body).to.have.property('errors');
+        expect(res.body.errors[0])
+          .to.have.property('param')
+          .equals('email');
+        expect(err).not.to.be.null;
+        done();
+      });
+  });
+
+  it('should fail if not from wolox domain', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wol.com.ar',
+        password: '12345678'
+      })
+      .end((err, res) => {
+        expect(res).to.have.status(422);
+        expect(res.body).to.have.property('errors');
+        expect(res.body.errors[0])
+          .to.have.property('param')
+          .equals('email');
+        expect(err).not.to.be.null;
+        done();
+      });
+  });
+});
