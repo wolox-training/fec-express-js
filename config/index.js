@@ -48,6 +48,9 @@ const config = {
     rollbar: {
       accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
       environment: process.env.ROLLBAR_ENV
+    },
+    externalApi: {
+      albumApiUrl: 'https://jsonplaceholder.typicode.com/'
     }
   }
 };
