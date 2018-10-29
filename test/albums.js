@@ -2,22 +2,11 @@ const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
   expect = chai.expect,
-  nock = require('nock');
+  { albumRequest } = require('./mocks');
 
 describe('/albums GET', () => {
   it('should list albums', done => {
-    const albumRequest = nock('https://jsonplaceholder.typicode.com/')
-      .get('/albums')
-      .reply(
-        200,
-        `[
-            {
-              "userId": 1,
-              "id": 1,
-              "title": "quidem molestiae enim"
-            }
-          ]`
-      );
+    const albumRequestMock = albumRequest();
     chai
       .request(server)
       .post('/users/sessions')
@@ -35,7 +24,7 @@ describe('/albums GET', () => {
             expect(res).to.be.a.json;
             expect(err).to.be.null;
             expect(res.body).to.have.property('albums');
-            albumRequest.isDone();
+            albumRequestMock.isDone();
             dictum.chai(res, 'Albums list endpoint');
             done();
           });

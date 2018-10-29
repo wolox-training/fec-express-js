@@ -1,17 +1,13 @@
-const logger = require('../logger');
-const axios = require('axios');
-const { Purchase } = require('../models');
-const { albumAlreadyPurchased, defaultError } = require('../errors');
+const logger = require('../logger'),
+  axios = require('axios'),
+  { Purchase } = require('../models'),
+  { albumAlreadyPurchased, defaultError } = require('../errors'),
+  { getAlbums } = require('../services/albumsApi');
 
 module.exports = {
   list(req, res, next) {
-    axios.get('https://jsonplaceholder.typicode.com/albums').then(function(response) {
-      res.status(200).json({
-        albums: response.data.map(album => {
-          delete album.userId;
-          return album;
-        })
-      });
+    getAlbums().then(function(albums) {
+      return res.status(200).json({ albums });
     });
   },
 
