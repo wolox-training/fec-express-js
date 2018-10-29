@@ -2,6 +2,7 @@ const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
   expect = chai.expect,
+  { Purchase } = require('../app/models'),
   nock = require('nock');
 
 describe('/albums GET', () => {
@@ -31,13 +32,12 @@ describe('/albums GET', () => {
           .get('/albums')
           .set('authorization', `Bearer ${res.body.token}`);
       })
-      .catch(err => {
-        expect(err).to.be.null;
-        expect(err.response).to.have.status(200);
-        expect(err.response).to.be.a.json;
-        expect(err.response.body).to.have.property('albums');
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.a.json;
+        expect(res.body).to.have.property('albums');
         albumRequest.isDone();
-        dictum.chai(err.response, 'Albums list endpoint');
+        dictum.chai(res, 'Albums list endpoint');
       });
   });
 
@@ -74,6 +74,14 @@ describe('/albums/:id POST', () => {
         expect(res.body).to.have.property('userId');
         expect(res.body).to.have.property('albumId');
         dictum.chai(res, 'Album purchase endpoint');
+        return Purchase.findOne({
+          where: {
+            userId: res.body.userId,
+            albumId: res.body.albumId
+          }
+        }).then(purchase => {
+          expect(purchase).not.to.be.null;
+        });
       });
   });
 
