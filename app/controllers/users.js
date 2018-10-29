@@ -144,7 +144,7 @@ module.exports = {
       { sessionInvalidate: Math.floor(Date.now() / 1000) },
       { returning: true, where: { email: req.user.email } }
     )
-      .then(function([rowsUpdate, [userUpdated]]) {
+      .then(([rowsUpdate, [userUpdated]]) => {
         res.status(200).json(userUpdated);
       })
       .catch(next);

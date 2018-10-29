@@ -25,7 +25,8 @@ module.exports = function(sequelize, DateTypes) {
         allowNull: false
       },
       sessionInvalidate: {
-        type: DateTypes.BIGINT
+        type: DateTypes.BIGINT,
+        field: 'session_invalidate'
       }
     },
     {
