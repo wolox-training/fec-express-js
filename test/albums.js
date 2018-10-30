@@ -63,7 +63,7 @@ describe('/albums/:id POST', () => {
             expect(res).to.have.status(200);
             expect(res).to.be.a.json;
             expect(err).to.be.null;
-            expect(res.body).to.have.property('user_id');
+            expect(res.body).to.have.property('userId');
             expect(res.body).to.have.property('albumId');
             albumRequestMock.isDone();
             dictum.chai(res, 'Album purchase endpoint');
