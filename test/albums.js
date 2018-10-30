@@ -2,12 +2,15 @@ const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
   expect = chai.expect,
-  { albumRequest, albumGetRequest } = require('./mocks');
+  { albumRequest, albumGetRequest } = require('./mocks'),
+  chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiAsPromised);
 
 describe('/albums GET', () => {
-  it('should list albums', done => {
+  it('should list albums', () => {
     const albumRequestMock = albumRequest();
-    chai
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -19,34 +22,32 @@ describe('/albums GET', () => {
           .request(server)
           .get('/albums')
           .set('authorization', `Bearer ${res.body.token}`);
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        expect(res.body).to.have.property('albums');
-        albumRequestMock.isDone();
-        dictum.chai(res, 'Albums list endpoint');
-        done();
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      expect(res.body).to.have.property('albums');
+      albumRequestMock.isDone();
+      dictum.chai(res, 'Albums list endpoint');
+    });
   });
 
-  it('should fail if no auth', done => {
-    chai
-      .request(server)
-      .get('/albums')
-      .catch(err => {
+  it('should fail if no auth', () => {
+    const promise = chai.request(server).get('/albums');
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(401);
         expect(err.response).to.be.a.json;
-        done();
       });
+    });
   });
 });
 
 describe('/albums/:id POST', () => {
-  it('should create a purchase', done => {
+  it('should create a purchase', () => {
     const albumRequestMock = albumGetRequest();
-    chai
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -58,22 +59,21 @@ describe('/albums/:id POST', () => {
           .request(server)
           .post('/albums/1')
           .set('authorization', `Bearer ${res.body.token}`);
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        expect(res.body).to.have.property('userId');
-        expect(res.body).to.have.property('albumId');
-        dictum.chai(res, 'Album purchase endpoint');
-        albumRequestMock.isDone();
-        done();
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      expect(res.body).to.have.property('userId');
+      expect(res.body).to.have.property('albumId');
+      dictum.chai(res, 'Album purchase endpoint');
+      albumRequestMock.isDone();
+    });
   });
 
-  it('should fail if purchase exists already', done => {
+  it('should fail if purchase exists already', () => {
     let token = '';
     const albumRequestMock = albumGetRequest();
-    chai
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -92,13 +92,14 @@ describe('/albums/:id POST', () => {
           .request(server)
           .post('/albums/1')
           .set('authorization', `Bearer ${token}`);
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(503);
         expect(err.response).to.be.a.json;
         albumRequestMock.isDone();
-        done();
       });
+    });
   });
 });

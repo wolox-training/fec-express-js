@@ -5,11 +5,12 @@ const chai = require('chai'),
   jwt = require('jsonwebtoken'),
   nock = require('nock'),
   config = require('../config').common,
+  { photoRequest } = require('./mocks'),
   { User, Purchase } = require('../app/models');
 
 describe('/users POST', () => {
-  it('should signup successfuly', done => {
-    chai
+  it('should signup successfuly', () => {
+    const promise = chai
       .request(server)
       .post('/users')
       .send({
@@ -17,17 +18,16 @@ describe('/users POST', () => {
         surname: 'Molina',
         email: 'juanignacio.molina@wolox.com.ar',
         password: 'pussy123'
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        dictum.chai(res, 'User signup endpoint');
-        done();
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      dictum.chai(res, 'User signup endpoint');
+    });
   });
 
-  it('should fail if email is not from wolox domain', done => {
-    chai
+  it('should fail if email is not from wolox domain', () => {
+    const promise = chai
       .request(server)
       .post('/users')
       .send({
@@ -35,17 +35,18 @@ describe('/users POST', () => {
         surname: 'Molina',
         email: 'juanignacio.molina@wolx.com.ar',
         password: 'pussy123'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
-        done();
       });
+    });
   });
 
-  it('should fail if password is less than 8 chars', done => {
-    chai
+  it('should fail if password is less than 8 chars', () => {
+    const promise = chai
       .request(server)
       .post('/users')
       .send({
@@ -53,85 +54,90 @@ describe('/users POST', () => {
         surname: 'Molina',
         email: 'juanignacio.molina@wolox.com.ar',
         password: 'pussy12'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
-        done();
       });
+    });
   });
 
-  it('should fail if name missing', done => {
-    chai
+  it('should fail if name missing', () => {
+    const promise = chai
       .request(server)
       .post('/users')
       .send({
         surname: 'Molina',
         email: 'juanignacio.molina@wolox.com.ar',
         password: 'pussy123'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
-        done();
       });
+    });
   });
 
-  it('should fail if password missing', done => {
-    chai
+  it('should fail if password missing', () => {
+    const promise = chai
       .request(server)
       .post('/users')
       .send({
         name: 'Juan Ignacio',
         surname: 'Molina',
         email: 'juanignacio.molina@wolox.com.ar'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
-        done();
       });
+    });
   });
 
-  it('should fail if surname missing', done => {
-    chai
+  it('should fail if surname missing', () => {
+    const promise = chai
       .request(server)
       .post('/users')
       .send({
         name: 'Juan Ignacio',
         email: 'juanignacio.molina@wolox.com.ar',
         password: 'pussy123'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
-        done();
       });
+    });
   });
 
-  it('should fail if email missing', done => {
-    chai
+  it('should fail if email missing', () => {
+    const promise = chai
       .request(server)
       .post('/users')
       .send({
         name: 'Juan Ignacio',
         surname: 'Molina',
         password: 'pussy123'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
-        done();
       });
+    });
   });
 
-  it('should fail if email is duped', done => {
-    chai
+  it('should fail if email is duped', () => {
+    const promise = chai
       .request(server)
       .post('/users')
       .send({
@@ -139,100 +145,104 @@ describe('/users POST', () => {
         surname: 'Casares',
         email: 'federico.casares@wolox.com.ar',
         password: '12345678'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(503);
         expect(err.response.body).to.have.property('message');
-        done();
       });
+    });
   });
 });
 
 describe('/users/sessions POST', () => {
-  it('should signin successfuly', done => {
-    chai
+  it('should signin successfuly', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
         email: 'federico.casares@wolox.com.ar',
         password: '12345678'
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        expect(res.body).to.have.property('token');
-        expect(res.body).to.have.property('expirationDate');
-        dictum.chai(res, 'User signin endpoint');
-        done();
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      expect(res.body).to.have.property('token');
+      expect(res.body).to.have.property('expirationDate');
+      dictum.chai(res, 'User signin endpoint');
+    });
   });
 
-  it('should fail if wrong password', done => {
-    chai
+  it('should fail if wrong password', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
         email: 'federico.casares@wolox.com.ar',
         password: 'notmypass'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(401);
-        done();
       });
+    });
   });
 
-  it('should fail if not password', done => {
-    chai
+  it('should fail if not password', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
         email: 'federico.casares@wolox.com.ar'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
-        done();
       });
+    });
   });
 
-  it('should fail if not email', done => {
-    chai
+  it('should fail if not email', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
         password: 'notmypass'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
         expect(err).not.to.be.null;
-        done();
       });
+    });
   });
 
-  it('should fail if not from wolox domain', done => {
-    chai
+  it('should fail if not from wolox domain', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
         email: 'federico.casares@wol.com.ar',
         password: '12345678'
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
-        done();
       });
+    });
   });
 });
 
 describe('/users GET', () => {
-  it('should list users', done => {
-    chai
+  it('should list users', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -245,64 +255,64 @@ describe('/users GET', () => {
           .request(server)
           .get('/users')
           .set('authorization', `Bearer ${res.body.token}`);
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        expect(res.body).to.have.property('users');
-        dictum.chai(res, 'Users list endpoint');
-        done();
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      expect(res.body).to.have.property('users');
+      dictum.chai(res, 'Users list endpoint');
+    });
   });
 
-  it('should fail if invalid token', done => {
-    chai
+  it('should fail if invalid token', () => {
+    const promise = chai
       .request(server)
       .get('/users')
-      .set('authorization', `Bearer 1234123`)
-      .catch(err => {
+      .set('authorization', `Bearer 1234123`);
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(401);
-        done();
       });
+    });
   });
 
-  it('should fail if token expired', done => {
-    User.findOne().then(user => {
+  it('should fail if token expired', () => {
+    const promise = User.findOne().then(user => {
       const token = jwt.sign(JSON.parse(JSON.stringify(user)), config.session.secret, {
         expiresIn: 0
       });
       return chai
         .request(server)
         .get('/users')
-        .set('authorization', `Bearer ${token}`)
-        .catch(err => {
-          expect(err).not.to.be.null;
-          expect(err.response).to.have.status(401);
-          expect(err.response).to.be.a.json;
-          expect(err.response.body)
-            .to.have.property('message')
-            .equals('jwt expired');
-          done();
-        });
+        .set('authorization', `Bearer ${token}`);
+    });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
+        expect(err).not.to.be.null;
+        expect(err.response).to.have.status(401);
+        expect(err.response).to.be.a.json;
+        expect(err.response.body)
+          .to.have.property('message')
+          .equals('jwt expired');
+      });
     });
   });
 
-  it('should fail if no token', done => {
-    chai
-      .request(server)
-      .get('/users')
-      .catch(err => {
+  it('should fail if no token', () => {
+    const promise = chai.request(server).get('/users');
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(401);
-        done();
       });
+    });
   });
 });
 
 describe('/admin/users POST', () => {
-  it('should create user admin successfuly', done => {
-    chai
+  it('should create user admin successfuly', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -320,17 +330,16 @@ describe('/admin/users POST', () => {
             email: 'juanignacio.molina@wolox.com.ar',
             password: 'pussy123'
           });
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        dictum.chai(res, 'User Admin signup endpoint');
-        done();
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      dictum.chai(res, 'User Admin signup endpoint');
+    });
   });
 
-  it('should update user admin successfuly', done => {
-    chai
+  it('should update user admin successfuly', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -348,16 +357,15 @@ describe('/admin/users POST', () => {
             email: 'federico.casares@wolox.com.ar',
             password: 'noImporta'
           });
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        done();
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+    });
   });
 
-  it('should fail if not admin', done => {
-    chai
+  it('should fail if not admin', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -375,19 +383,20 @@ describe('/admin/users POST', () => {
             email: 'federico.casares@wolox.com.ar',
             password: 'noImporta'
           });
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(401);
         expect(err.response).to.be.a.json;
-        done();
       });
+    });
   });
 });
 
 describe('/users/:id/albums GET', () => {
-  it('should list albums of my own', done => {
-    chai
+  it('should list albums of my own', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -399,18 +408,17 @@ describe('/users/:id/albums GET', () => {
           .request(server)
           .get('/users/1/albums')
           .set('authorization', `Bearer ${res.body.token}`);
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        expect(res.body).to.have.property('albums');
-        dictum.chai(res, 'User albums list endpoint');
-        done();
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      expect(res.body).to.have.property('albums');
+      dictum.chai(res, 'User albums list endpoint');
+    });
   });
 
-  it('should list albums of other user with admin rights', done => {
-    chai
+  it('should list albums of other user with admin rights', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -422,18 +430,17 @@ describe('/users/:id/albums GET', () => {
           .request(server)
           .get('/users/2/albums')
           .set('authorization', `Bearer ${res.body.token}`);
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        expect(res.body).to.have.property('albums');
-        dictum.chai(res, 'User albums list endpoint');
-        done();
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      expect(res.body).to.have.property('albums');
+      dictum.chai(res, 'User albums list endpoint');
+    });
   });
 
-  it('should fail to list albums of other user without admin rights', done => {
-    chai
+  it('should fail to list albums of other user without admin rights', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -445,34 +452,22 @@ describe('/users/:id/albums GET', () => {
           .request(server)
           .get('/users/1/albums')
           .set('authorization', `Bearer ${response.body.token}`);
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(401);
         expect(err.response).to.be.a.json;
         dictum.chai(err.response, 'User albums list endpoint');
-        done();
       });
+    });
   });
 });
 
 describe('/users/albums/:id/photos GET', () => {
-  it('should list album photos of one of my albums', done => {
-    const photoRequest = nock('https://jsonplaceholder.typicode.com/')
-      .get('/photos?albumId=7')
-      .reply(
-        200,
-        `[
-            {
-              "albumId": 1,
-              "id": 1,
-              "title": "accusamus beatae ad facilis cum similique qui sunt",
-              "url": "https://via.placeholder.com/600/92c952",
-              "thumbnailUrl": "https://via.placeholder.com/150/92c952"
-            }
-          ]`
-      );
-    chai
+  it('should list album photos of one of my albums', () => {
+    const photoRequestMock = photoRequest();
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -484,19 +479,18 @@ describe('/users/albums/:id/photos GET', () => {
           .request(server)
           .get('/users/albums/7/photos')
           .set('authorization', `Bearer ${res.body.token}`);
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        expect(res.body).to.have.property('photos');
-        photoRequest.isDone();
-        dictum.chai(res, 'User album photos list endpoint');
-        done();
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      expect(res.body).to.have.property('photos');
+      photoRequestMock.isDone();
+      dictum.chai(res, 'User album photos list endpoint');
+    });
   });
 
-  it('should fail to list album photos if not one of my albums', done => {
-    chai
+  it('should fail to list album photos if not one of my albums', () => {
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -508,20 +502,21 @@ describe('/users/albums/:id/photos GET', () => {
           .request(server)
           .get('/users/albums/1/photos')
           .set('authorization', `Bearer ${res.body.token}`);
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err.response).to.have.status(500);
         expect(err.response).to.be.a.json;
         expect(err).not.to.be.null;
-        done();
       });
+    });
   });
 });
 
 describe('/users/sessions/invalidate_all POST', () => {
-  it('should invalidate sessions created', done => {
+  it('should invalidate sessions created', () => {
     let token = '';
-    chai
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -543,15 +538,16 @@ describe('/users/sessions/invalidate_all POST', () => {
           .request(server)
           .post('/users/sessions/invalidate_all')
           .set('authorization', `Bearer ${token}`);
-      })
-      .catch(err => {
+      });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err.response).to.have.status(401);
         expect(err.response).to.be.a.json;
         expect(err.response.body)
           .to.have.property('message')
           .equals('Token Invalidated');
         expect(err).not.to.be.null;
-        done();
       });
+    });
   });
 });
