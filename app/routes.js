@@ -51,6 +51,7 @@ exports.init = app => {
   );
 
   app.get('/users', [jwt({ secret: config.secret })], userController.usersList);
+  app.get('/users/:id/albums', [jwt({ secret: config.secret })], albumController.albumList);
 
   app.post(
     '/admin/users',
