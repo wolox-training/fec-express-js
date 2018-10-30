@@ -11,6 +11,12 @@ exports.execute = () => {
     updatedAt: '2018-10-24T18:51:59.125Z',
     createdAt: '2018-10-24T18:51:59.125Z'
   })
+    .then(user => {
+      return Purchase.create({
+        userId: user.id,
+        albumId: 7
+      });
+    })
     .then(() => {
       return User.create({
         name: 'Federico',
@@ -20,12 +26,6 @@ exports.execute = () => {
         password: '$2b$10$FoKOu6OIHD20/6C8E86YjueiahPtZwSxLFRJJucC7o0wY3bkVmXHS',
         updatedAt: '2018-10-24T18:51:59.125Z',
         createdAt: '2018-10-24T18:51:59.125Z'
-      });
-    })
-    .then(() => {
-      return Purchase.create({
-        userId: 1,
-        albumId: 7
       });
     });
 };

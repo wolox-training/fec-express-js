@@ -27,19 +27,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      admin: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
-      },
-      sessionInvalidate: {
-        type: Sequelize.BIGINT
-      },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE
       }

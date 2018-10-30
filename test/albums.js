@@ -2,22 +2,11 @@ const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
   expect = chai.expect,
-  nock = require('nock');
+  { albumRequest, albumGetRequest } = require('./mocks');
 
 describe('/albums GET', () => {
   it('should list albums', done => {
-    const albumRequest = nock('https://jsonplaceholder.typicode.com/')
-      .get('/albums')
-      .reply(
-        200,
-        `[
-            {
-              "userId": 1,
-              "id": 1,
-              "title": "quidem molestiae enim"
-            }
-          ]`
-      );
+    const albumRequestMock = albumRequest();
     chai
       .request(server)
       .post('/users/sessions')
@@ -35,7 +24,7 @@ describe('/albums GET', () => {
         expect(res).to.have.status(200);
         expect(res).to.be.a.json;
         expect(res.body).to.have.property('albums');
-        albumRequest.isDone();
+        albumRequestMock.isDone();
         dictum.chai(res, 'Albums list endpoint');
         done();
       });
@@ -56,6 +45,7 @@ describe('/albums GET', () => {
 
 describe('/albums/:id POST', () => {
   it('should create a purchase', done => {
+    const albumRequestMock = albumGetRequest();
     chai
       .request(server)
       .post('/users/sessions')
@@ -75,12 +65,14 @@ describe('/albums/:id POST', () => {
         expect(res.body).to.have.property('userId');
         expect(res.body).to.have.property('albumId');
         dictum.chai(res, 'Album purchase endpoint');
+        albumRequestMock.isDone();
         done();
       });
   });
 
   it('should fail if purchase exists already', done => {
     let token = '';
+    const albumRequestMock = albumGetRequest();
     chai
       .request(server)
       .post('/users/sessions')
@@ -105,6 +97,7 @@ describe('/albums/:id POST', () => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(500);
         expect(err.response).to.be.a.json;
+        albumRequestMock.isDone();
         done();
       });
   });
