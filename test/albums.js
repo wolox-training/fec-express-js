@@ -5,7 +5,7 @@ const chai = require('chai'),
   nock = require('nock');
 
 describe('/albums GET', () => {
-  it('should list albums', () => {
+  it('should list albums', done => {
     const albumRequest = nock('https://jsonplaceholder.typicode.com/')
       .get('/albums')
       .reply(
@@ -18,7 +18,7 @@ describe('/albums GET', () => {
             }
           ]`
       );
-    return chai
+    chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -31,31 +31,32 @@ describe('/albums GET', () => {
           .get('/albums')
           .set('authorization', `Bearer ${res.body.token}`);
       })
-      .catch(err => {
-        expect(err).to.be.null;
-        expect(err.response).to.have.status(200);
-        expect(err.response).to.be.a.json;
-        expect(err.response.body).to.have.property('albums');
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.a.json;
+        expect(res.body).to.have.property('albums');
         albumRequest.isDone();
-        dictum.chai(err.response, 'Albums list endpoint');
+        dictum.chai(res, 'Albums list endpoint');
+        done();
       });
   });
 
-  it('should fail if no auth', () => {
-    return chai
+  it('should fail if no auth', done => {
+    chai
       .request(server)
       .get('/albums')
       .catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(401);
         expect(err.response).to.be.a.json;
+        done();
       });
   });
 });
 
 describe('/albums/:id POST', () => {
-  it('should create a purchase', () => {
-    return chai
+  it('should create a purchase', done => {
+    chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -74,12 +75,13 @@ describe('/albums/:id POST', () => {
         expect(res.body).to.have.property('userId');
         expect(res.body).to.have.property('albumId');
         dictum.chai(res, 'Album purchase endpoint');
+        done();
       });
   });
 
-  it('should fail if purchase exists already', () => {
+  it('should fail if purchase exists already', done => {
     let token = '';
-    return chai
+    chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -103,6 +105,7 @@ describe('/albums/:id POST', () => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(500);
         expect(err.response).to.be.a.json;
+        done();
       });
   });
 });
