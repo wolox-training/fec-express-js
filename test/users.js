@@ -25,7 +25,7 @@ describe('/users POST', () => {
       expect(res.body).to.have.property('email');
       dictum.chai(res, 'User signup endpoint');
       return User.findOne({ where: { email: res.body.email } }).then(user => {
-          expect(user).not.to.be.null;
+        expect(user).not.to.be.null;
       });
     });
   });
@@ -121,17 +121,17 @@ describe('/users POST', () => {
   });
 
   it('should fail if surname missing', () => {
-      const userParams = {
-        name: 'Juan Ignacio',
-        email: 'juanignacio.molina@wolox.com.ar',
-        password: 'pussy123'
-      };
-      const promise = chai
+    const userParams = {
+      name: 'Juan Ignacio',
+      email: 'juanignacio.molina@wolox.com.ar',
+      password: 'pussy123'
+    };
+    const promise = chai
       .request(server)
       .post('/users')
       .send(userParams);
     return expect(promise).to.be.rejected.then(() => {
-      return promise.catch(err => {}
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
@@ -360,7 +360,7 @@ describe('/admin/users POST', () => {
       expect(res).to.be.a.json;
       dictum.chai(res, 'User Admin signup endpoint');
       return User.findOne({ where: { email: res.body.email } }).then(user => {
-          expect(user).not.to.be.null;
+        expect(user).not.to.be.null;
       });
     });
   });
@@ -389,8 +389,8 @@ describe('/admin/users POST', () => {
       expect(res).to.have.status(200);
       expect(res).to.be.a.json;
       expect(res.body)
-          .to.have.property('admin')
-          .equals(true);
+        .to.have.property('admin')
+        .equals(true);
     });
   });
 

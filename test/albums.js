@@ -69,13 +69,13 @@ describe('/albums/:id POST', () => {
       dictum.chai(res, 'Album purchase endpoint');
       albumRequestMock.isDone();
       return Purchase.findOne({
-          where: {
-            userId: res.body.userId,
-            albumId: res.body.albumId
-          }
-        }).then(purchase => {
-          expect(purchase).not.to.be.null;
-        });
+        where: {
+          userId: res.body.userId,
+          albumId: res.body.albumId
+        }
+      }).then(purchase => {
+        expect(purchase).not.to.be.null;
+      });
     });
   });
 
