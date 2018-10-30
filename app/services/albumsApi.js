@@ -3,7 +3,7 @@ const axios = require('axios'),
   apiClient = axios.create({ baseURL: config.albumApiUrl });
 
 module.exports.getAlbums = () => {
-  return apiClient.get('/albums').then(function(response) {
+  return apiClient.get('/albums').then(response => {
     return response.data.map(album => {
       delete album.userId;
       return album;
@@ -16,7 +16,7 @@ module.exports.getAlbum = id => {
 };
 
 module.exports.getPhotos = id => {
-  return apiClient.get(`/photos?albumId=${id}`).then(function(response) {
+  return apiClient.get(`/photos?albumId=${id}`).then(response => {
     return response.data.map(photo => {
       delete photo.albumId;
       return photo;

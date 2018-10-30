@@ -6,7 +6,7 @@ const logger = require('../logger'),
 
 module.exports = {
   list(req, res, next) {
-    albumsApi.getAlbums().then(function(albums) {
+    return albumsApi.getAlbums().then(albums => {
       return res.status(200).json({ albums });
     });
   },
@@ -58,7 +58,7 @@ module.exports = {
       if (!p) {
         next(defaultError('Album has not been purchased.'));
       } else {
-        albumsApi.getPhotos(p.albumId).then(function(photos) {
+        albumsApi.getPhotos(p.albumId).then(photos => {
           res.status(200).json({ photos });
         });
       }

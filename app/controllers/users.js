@@ -1,8 +1,7 @@
 const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { User, Purchase } = require('../models');
-const axios = require('axios');
+const { User } = require('../models');
 const logger = require('../logger');
 const config = require('../../config').common.session;
 const { defaultError } = require('../errors');
