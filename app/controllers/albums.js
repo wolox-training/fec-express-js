@@ -2,11 +2,11 @@ const logger = require('../logger'),
   axios = require('axios'),
   { Purchase } = require('../models'),
   { albumNotFound, albumAlreadyPurchased, defaultError } = require('../errors'),
-  { getAlbums, getAlbum } = require('../services/albumsApi');
+  albumsApi = require('../services/albumsApi');
 
 module.exports = {
   list(req, res, next) {
-    getAlbums().then(function(albums) {
+    return albumsApi.getAlbums().then(albums => {
       return res.status(200).json({ albums });
     });
   },
@@ -16,7 +16,8 @@ module.exports = {
       userId: req.user.id,
       albumId: req.params.id
     };
-    return getAlbum(purchase.albumId)
+    return albumsApi
+      .getAlbum(purchase.albumId)
       .then(album => {
         if (!album.data || !album.data.id) {
           return next(albumNotFound(purchase.albumId));
@@ -46,6 +47,21 @@ module.exports = {
           return { id: p.albumId };
         })
       });
+    });
+  },
+  albumPhotosList(req, res, next) {
+    const purchase = {
+      userId: req.user.id,
+      albumId: req.params.id
+    };
+    Purchase.findOne({ where: purchase }).then(p => {
+      if (!p) {
+        next(defaultError('Album has not been purchased.'));
+      } else {
+        albumsApi.getPhotos(p.albumId).then(photos => {
+          res.status(200).json({ photos });
+        });
+      }
     });
   }
 };
