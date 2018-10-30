@@ -1,5 +1,8 @@
-module.exports = function(sequelize, DateTypes) {
-  return sequelize.define(
+const bcrypt = require('bcrypt'),
+  logger = require('../logger');
+
+module.exports = (sequelize, DateTypes) => {
+  const User = sequelize.define(
     'User',
     {
       name: {
@@ -18,6 +21,11 @@ module.exports = function(sequelize, DateTypes) {
       password: {
         type: DateTypes.STRING,
         allowNull: false
+      },
+      admin: {
+        type: DateTypes.BOOLEAN,
+        default: false,
+        allowNull: false
       }
     },
     {
@@ -31,4 +39,14 @@ module.exports = function(sequelize, DateTypes) {
       }
     }
   );
+
+  User.createWithHashedPw = userParams => {
+    userParams.password = bcrypt.hashSync(userParams.password, 10);
+    return User.create(userParams).then(user => {
+      logger.info(`User ${user.name} successfuly created!`);
+      return user;
+    });
+  };
+
+  return User;
 };
