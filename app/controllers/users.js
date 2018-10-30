@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const logger = require('../logger');
+const moment = require('moment');
 const config = require('../../config').common.session;
 const { defaultError } = require('../errors');
 
@@ -48,14 +49,21 @@ module.exports = {
         if (bcrypt.compareSync(password, user.password)) {
           logger.info(`User ${email} authenticated.`);
           delete user.dataValues.password;
-          const token = jwt.sign(JSON.stringify(user), config.secret);
-          return res.status(200).json({ token });
+          const token = jwt.sign(JSON.parse(JSON.stringify(user)), config.secret, {
+            expiresIn: config.expirationInSeconds
+          });
+          return res.status(200).json({
+            token,
+            expirationDate: moment()
+              .add(config.expirationInSeconds, 'seconds')
+              .unix()
+          });
         } else {
           logger.error('Password mismatch.');
           return res.status(401).json({ error: 'User auth failed. Check your email or password.' });
         }
       })
-      .catch(logDBError(res));
+      .catch(next);
   },
   usersList(req, res, next) {
     let page = parseInt(req.query.page) || 1;
