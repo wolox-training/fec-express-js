@@ -13,7 +13,7 @@ module.exports = {
 
   buy(req, res, next) {
     const purchase = {
-      user_id: req.user.id,
+      userId: req.user.id,
       albumId: req.params.id
     };
     return getAlbum(purchase.albumId)

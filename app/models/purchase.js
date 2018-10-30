@@ -13,17 +13,20 @@ module.exports = function(sequelize, DateTypes) {
         allowNull: false,
         field: 'album_id'
       },
+      userId: {
+        type: DateTypes.INTEGER,
+        allowNull: false,
+        field: 'user_id'
+      },
       date: {
         type: DateTypes.DATE,
         defaultValue: DateTypes.NOW
       }
     },
     {
-      timestamps: true
+      timestamps: true,
+      underscored: true
     }
   );
-  Purchase.associate = function(models) {
-    Purchase.belongsTo(models.User, { as: 'user', foreignKey: 'user_id' });
-  };
   return Purchase;
 };
