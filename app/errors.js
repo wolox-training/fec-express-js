@@ -35,3 +35,6 @@ exports.needsAdmin = internalError('User is not admin.', exports.NEEDS_ADMIN);
 exports.EXTERNAL_API_ERROR = 'external_api_error';
 exports.externalApiError = error =>
   internalError(error.message || 'External Api Error', exports.EXTERNAL_API_ERROR);
+
+exports.ALBUM_NOT_FOUND = 'album_not_found';
+exports.albumNotFound = id => internalError(`The album ${id} was not found`, exports.ALBUM_NOT_FOUND);

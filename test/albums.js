@@ -3,23 +3,15 @@ const chai = require('chai'),
   server = require('./../app'),
   expect = chai.expect,
   { Purchase } = require('../app/models'),
-  nock = require('nock');
+  { albumRequest, albumGetRequest } = require('./mocks'),
+  chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiAsPromised);
 
 describe('/albums GET', () => {
   it('should list albums', () => {
-    const albumRequest = nock('https://jsonplaceholder.typicode.com/')
-      .get('/albums')
-      .reply(
-        200,
-        `[
-            {
-              "userId": 1,
-              "id": 1,
-              "title": "quidem molestiae enim"
-            }
-          ]`
-      );
-    return chai
+    const albumRequestMock = albumRequest();
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -31,31 +23,32 @@ describe('/albums GET', () => {
           .request(server)
           .get('/albums')
           .set('authorization', `Bearer ${res.body.token}`);
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        expect(res.body).to.have.property('albums');
-        albumRequest.isDone();
-        dictum.chai(res, 'Albums list endpoint');
       });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      expect(res.body).to.have.property('albums');
+      albumRequestMock.isDone();
+      dictum.chai(res, 'Albums list endpoint');
+    });
   });
 
   it('should fail if no auth', () => {
-    return chai
-      .request(server)
-      .get('/albums')
-      .catch(err => {
+    const promise = chai.request(server).get('/albums');
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(401);
         expect(err.response).to.be.a.json;
       });
+    });
   });
 });
 
 describe('/albums/:id POST', () => {
   it('should create a purchase', () => {
-    return chai
+    const albumRequestMock = albumGetRequest();
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -67,14 +60,15 @@ describe('/albums/:id POST', () => {
           .request(server)
           .post('/albums/1')
           .set('authorization', `Bearer ${res.body.token}`);
-      })
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.a.json;
-        expect(res.body).to.have.property('userId');
-        expect(res.body).to.have.property('albumId');
-        dictum.chai(res, 'Album purchase endpoint');
-        return Purchase.findOne({
+      });
+    return expect(promise).to.be.fulfilled.then(res => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.a.json;
+      expect(res.body).to.have.property('userId');
+      expect(res.body).to.have.property('albumId');
+      dictum.chai(res, 'Album purchase endpoint');
+      albumRequestMock.isDone();
+      return Purchase.findOne({
           where: {
             userId: res.body.userId,
             albumId: res.body.albumId
@@ -82,12 +76,13 @@ describe('/albums/:id POST', () => {
         }).then(purchase => {
           expect(purchase).not.to.be.null;
         });
-      });
+    });
   });
 
   it('should fail if purchase exists already', () => {
     let token = '';
-    return chai
+    const albumRequestMock = albumGetRequest();
+    const promise = chai
       .request(server)
       .post('/users/sessions')
       .send({
@@ -106,11 +101,14 @@ describe('/albums/:id POST', () => {
           .request(server)
           .post('/albums/1')
           .set('authorization', `Bearer ${token}`);
-      })
-      .catch(err => {
-        expect(err).not.to.be.null;
-        expect(err.response).to.have.status(500);
-        expect(err.response).to.be.a.json;
       });
+    return expect(promise).to.be.rejected.then(() => {
+      return promise.catch(err => {
+        expect(err).not.to.be.null;
+        expect(err.response).to.have.status(503);
+        expect(err.response).to.be.a.json;
+        albumRequestMock.isDone();
+      });
+    });
   });
 });

@@ -10,12 +10,12 @@ module.exports = {
         primaryKey: true,
         unique: true
       },
-      userId: {
+      user_id: {
         type: Sequelize.INTEGER,
         foreignKey: true,
         allowNull: false
       },
-      albumId: {
+      album_id: {
         type: Sequelize.INTEGER,
         allowNull: false
       },
@@ -23,6 +23,14 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.NOW
+      },
+      created_at: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updated_at: {
+        allowNull: false,
+        type: Sequelize.DATE
       }
     });
   },
