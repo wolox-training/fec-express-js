@@ -51,10 +51,9 @@ exports.init = app => {
 
   app.post('/users/sessions/invalidate_all', [tokenCheck], userController.invalidateAllSessions);
   app.get('/users', [tokenCheck], userController.usersList);
-  app.get('/users/:id/albums', [tokenCheck], userController.albumList);
-  app.get('/users/albums/:id/photos', [tokenCheck], userController.albumPhotosList);
+  app.get('/users/:id/albums', [tokenCheck], albumController.albumList);
+  app.get('/users/albums/:id/photos', [tokenCheck], albumController.albumPhotosList);
   app.post('/admin/users', [tokenCheck].concat(userValidations), userController.userAdminCreate);
-
   app.get('/albums', [tokenCheck], albumController.list);
   app.post('/albums/:id', [tokenCheck], albumController.buy);
 };
