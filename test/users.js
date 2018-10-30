@@ -542,3 +542,40 @@ describe('/users/albums/:id/photos GET', () => {
       });
   });
 });
+
+describe('/users/sessions/invalidate_all POST', () => {
+  it('should invalidate sessions created', done => {
+    chai
+      .request(server)
+      .post('/users/sessions')
+      .send({
+        email: 'federico.casares@wolox.com.ar',
+        password: '12345678'
+      })
+      .then(response => {
+        const token = response.body.token;
+        chai
+          .request(server)
+          .post('/users/sessions/invalidate_all')
+          .set('authorization', `Bearer ${token}`)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.a.json;
+            dictum.chai(res, 'Invalidate all user sessions endpoint');
+            chai
+              .request(server)
+              .post('/users/sessions/invalidate_all')
+              .set('authorization', `Bearer ${token}`)
+              .end((err, res2) => {
+                expect(res2).to.have.status(500);
+                expect(res2).to.be.a.json;
+                expect(res2.body)
+                  .to.have.property('message')
+                  .equals('Token Invalidated');
+                expect(err).not.to.be.null;
+                done();
+              });
+          });
+      });
+  });
+});
