@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Users', {
+    return queryInterface.createTable('Purchases', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -10,27 +10,19 @@ module.exports = {
         primaryKey: true,
         unique: true
       },
-      name: {
-        type: Sequelize.STRING,
+      user_id: {
+        type: Sequelize.INTEGER,
+        foreignKey: true,
         allowNull: false
       },
-      surname: {
-        type: Sequelize.STRING,
+      album_id: {
+        type: Sequelize.INTEGER,
         allowNull: false
       },
-      email: {
-        type: Sequelize.STRING,
+      date: {
+        type: Sequelize.DATE,
         allowNull: false,
-        unique: true
-      },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      admin: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
+        defaultValue: Sequelize.NOW
       },
       created_at: {
         allowNull: false,
@@ -42,8 +34,7 @@ module.exports = {
       }
     });
   },
-
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Users');
+    return queryInterface.dropTable('Purchases');
   }
 };

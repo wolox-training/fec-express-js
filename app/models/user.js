@@ -29,6 +29,7 @@ module.exports = (sequelize, DateTypes) => {
       }
     },
     {
+      underscored: true,
       defaultScope: {
         attributes: { exclude: ['password'] }
       },
