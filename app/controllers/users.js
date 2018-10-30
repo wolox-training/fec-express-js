@@ -46,6 +46,7 @@ module.exports = {
         }
         if (bcrypt.compareSync(password, user.password)) {
           logger.info(`User ${email} authenticated.`);
+          delete user.dataValues.password;
           const token = jwt.sign(JSON.stringify(user), config.secret);
           return res.status(200).json({ token });
         } else {
@@ -57,11 +58,12 @@ module.exports = {
   },
   usersList(req, res, next) {
     let page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.size) || 10;
     page = page > 0 ? page : 1;
-    const pageSize = 10;
-    return User.findAll({ offset: pageSize * (page - 1), limit: pageSize })
-      .then(users => {
-        return res.status(200).json({ users, page });
+    return User.findAndCountAll({ offset: pageSize * (page - 1), limit: pageSize })
+      .then(result => {
+        const users = result.rows;
+        return res.status(200).json({ users, page, count: users.length, total: result.count });
       })
       .catch(logDBError(res));
   },
