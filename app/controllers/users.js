@@ -1,50 +1,30 @@
-const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const logger = require('../logger');
 const moment = require('moment');
 const config = require('../../config').common.session;
-const { defaultError } = require('../errors');
-
-function logDBError(res) {
-  return error => {
-    logger.error(`DB: ${error.errors[0]}`);
-    res.status(500).json({ error: error.errors[0].message });
-  };
-}
+const { dbError, userUnauthorized, needsAdmin, albumNotPurchased } = require('../errors');
 
 module.exports = {
   userCreate(req, res, next) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      logger.error('User input invalid.');
-      logger.error(errors.array());
-      return res.status(422).json({ errors: errors.array() });
-    }
     const userRaw = req.body;
     userRaw.admin = false;
     return User.createWithHashedPw(userRaw)
       .then(user => {
         return res.status(200).json(user);
       })
-      .catch(logDBError(res));
+      .catch(err => next(dbError(err)));
   },
 
   userNewSession(req, res, next) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      logger.error('User input invalid.');
-      logger.error(errors.array());
-      return res.status(422).json({ errors: errors.array() });
-    }
     const { email, password } = req.body;
     return User.scope('withPasswd')
       .findOne({ where: { email } })
       .then(user => {
         if (!user) {
           logger.error('Email is not registered.');
-          return res.status(401).json({ error: 'User auth failed. Check your email or password.' });
+          return next(userUnauthorized);
         }
         if (bcrypt.compareSync(password, user.password)) {
           logger.info(`User ${email} authenticated.`);
@@ -60,10 +40,10 @@ module.exports = {
           });
         } else {
           logger.error('Password mismatch.');
-          return res.status(401).json({ error: 'User auth failed. Check your email or password.' });
+          return next(userUnauthorized);
         }
       })
-      .catch(next);
+      .catch(err => next(dbError(err)));
   },
   usersList(req, res, next) {
     let page = parseInt(req.query.page) || 1;
@@ -74,20 +54,9 @@ module.exports = {
         const users = result.rows;
         return res.status(200).json({ users, page, count: users.length, total: result.count });
       })
-      .catch(logDBError(res));
+      .catch(err => next(dbError(err)));
   },
   userAdminCreate(req, res, next) {
-    const errors = validationResult(req);
-    // TODO: Move to middleware
-    if (!errors.isEmpty()) {
-      logger.error('User input invalid.');
-      logger.error(errors.array());
-      return res.status(422).json({ errors: errors.array() });
-    }
-    // TODO: Move to middleware
-    if (!req.user.admin) {
-      return res.status(401).json({ message: 'User is not an admin.' });
-    }
     const userRaw = req.body;
     return User.findOne({ where: { email: userRaw.email } })
       .then(user => {
@@ -96,17 +65,17 @@ module.exports = {
             .then(([rowsUpdate, [userUpdated]]) => {
               return res.status(200).json(userUpdated);
             })
-            .catch(logDBError(res));
+            .catch(err => next(dbError(err)));
         } else {
           userRaw.admin = true;
           return User.createWithHashedPw(userRaw)
             .then(userCreated => {
               return res.status(200).json(userCreated);
             })
-            .catch(logDBError(res));
+            .catch(err => next(dbError(err)));
         }
       })
-      .catch(logDBError(res));
+      .catch(err => next(dbError(err)));
   },
   invalidateAllSessions(req, res, next) {
     return User.update(

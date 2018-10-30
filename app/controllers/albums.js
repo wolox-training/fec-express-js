@@ -1,14 +1,16 @@
 const logger = require('../logger'),
-  axios = require('axios'),
   { Purchase } = require('../models'),
-  { albumNotFound, albumAlreadyPurchased, defaultError } = require('../errors'),
+  { albumNotFound, albumAlreadyPurchased, defaultError, dbError, externalApiError } = require('../errors'),
   albumsApi = require('../services/albumsApi');
 
 module.exports = {
   list(req, res, next) {
-    return albumsApi.getAlbums().then(albums => {
-      return res.status(200).json({ albums });
-    });
+    return albumsApi
+      .getAlbums()
+      .then(albums => {
+        return res.status(200).json({ albums });
+      })
+      .catch(err => next(externalApiError(err)));
   },
 
   buy(req, res, next) {
@@ -33,9 +35,7 @@ module.exports = {
       .then(p => {
         res.status(200).json(p);
       })
-      .catch(err => {
-        next(defaultError(err.message));
-      });
+      .catch(err => next(dbError(err)));
   },
   albumList(req, res, next) {
     if (!req.user.admin && req.user.id !== parseInt(req.params.id)) {
