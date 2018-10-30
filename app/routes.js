@@ -1,6 +1,7 @@
 const { check } = require('express-validator/check');
 const jwt = require('express-jwt');
 const userController = require('./controllers/users');
+const albumController = require('./controllers/albums');
 const config = require('../config').common.session;
 
 exports.init = app => {
@@ -56,4 +57,6 @@ exports.init = app => {
     [jwt({ secret: config.secret })].concat(userValidations),
     userController.userAdminCreate
   );
+
+  app.get('/albums', [jwt({ secret: config.secret })], albumController.list);
 };
