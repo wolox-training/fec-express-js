@@ -95,7 +95,7 @@ describe('/albums/:id POST', () => {
       })
       .catch(err => {
         expect(err).not.to.be.null;
-        expect(err.response).to.have.status(500);
+        expect(err.response).to.have.status(503);
         expect(err.response).to.be.a.json;
         albumRequestMock.isDone();
         done();
