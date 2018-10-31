@@ -2,6 +2,7 @@ const chai = require('chai'),
   dictum = require('dictum.js'),
   server = require('./../app'),
   expect = chai.expect,
+  { Purchase } = require('../app/models'),
   { albumRequest, albumGetRequest } = require('./mocks'),
   chaiAsPromised = require('chai-as-promised');
 
@@ -67,6 +68,14 @@ describe('/albums/:id POST', () => {
       expect(res.body).to.have.property('albumId');
       dictum.chai(res, 'Album purchase endpoint');
       albumRequestMock.isDone();
+      return Purchase.findOne({
+        where: {
+          userId: res.body.userId,
+          albumId: res.body.albumId
+        }
+      }).then(purchase => {
+        expect(purchase).not.to.be.null;
+      });
     });
   });
 

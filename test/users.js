@@ -22,98 +22,122 @@ describe('/users POST', () => {
     return expect(promise).to.be.fulfilled.then(res => {
       expect(res).to.have.status(200);
       expect(res).to.be.a.json;
+      expect(res.body).to.have.property('email');
       dictum.chai(res, 'User signup endpoint');
+      return User.findOne({ where: { email: res.body.email } }).then(user => {
+        expect(user).not.to.be.null;
+      });
     });
   });
 
   it('should fail if email is not from wolox domain', () => {
+    const userParams = {
+      name: 'Juan Ignacio',
+      surname: 'Molina',
+      email: 'juanignacio.molina@wolx.com.ar',
+      password: 'pussy123'
+    };
     const promise = chai
       .request(server)
       .post('/users')
-      .send({
-        name: 'Juan Ignacio',
-        surname: 'Molina',
-        email: 'juanignacio.molina@wolx.com.ar',
-        password: 'pussy123'
-      });
+      .send(userParams);
     return expect(promise).to.be.rejected.then(() => {
       return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
+        return User.findOne({ where: { email: userParams.email } }).then(user => {
+          expect(user).to.be.null;
+        });
       });
     });
   });
 
   it('should fail if password is less than 8 chars', () => {
+    const userParams = {
+      name: 'Juan Ignacio',
+      surname: 'Molina',
+      email: 'juanignacio.molina@wolox.com.ar',
+      password: 'pussy12'
+    };
     const promise = chai
       .request(server)
       .post('/users')
-      .send({
-        name: 'Juan Ignacio',
-        surname: 'Molina',
-        email: 'juanignacio.molina@wolox.com.ar',
-        password: 'pussy12'
-      });
+      .send(userParams);
     return expect(promise).to.be.rejected.then(() => {
       return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
+        return User.findOne({ where: { email: userParams.email } }).then(user => {
+          expect(user).to.be.null;
+        });
       });
     });
   });
 
   it('should fail if name missing', () => {
+    const userParams = {
+      surname: 'Molina',
+      email: 'juanignacio.molina@wolox.com.ar',
+      password: 'pussy123'
+    };
     const promise = chai
       .request(server)
       .post('/users')
-      .send({
-        surname: 'Molina',
-        email: 'juanignacio.molina@wolox.com.ar',
-        password: 'pussy123'
-      });
+      .send(userParams);
     return expect(promise).to.be.rejected.then(() => {
       return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
+        return User.findOne({ where: { email: userParams.email } }).then(user => {
+          expect(user).to.be.null;
+        });
       });
     });
   });
 
   it('should fail if password missing', () => {
+    const userParams = {
+      name: 'Juan Ignacio',
+      surname: 'Molina',
+      email: 'juanignacio.molina@wolox.com.ar'
+    };
     const promise = chai
       .request(server)
       .post('/users')
-      .send({
-        name: 'Juan Ignacio',
-        surname: 'Molina',
-        email: 'juanignacio.molina@wolox.com.ar'
-      });
+      .send(userParams);
     return expect(promise).to.be.rejected.then(() => {
       return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
+        return User.findOne({ where: { email: userParams.email } }).then(user => {
+          expect(user).to.be.null;
+        });
       });
     });
   });
 
   it('should fail if surname missing', () => {
+    const userParams = {
+      name: 'Juan Ignacio',
+      email: 'juanignacio.molina@wolox.com.ar',
+      password: 'pussy123'
+    };
     const promise = chai
       .request(server)
       .post('/users')
-      .send({
-        name: 'Juan Ignacio',
-        email: 'juanignacio.molina@wolox.com.ar',
-        password: 'pussy123'
-      });
+      .send(userParams);
     return expect(promise).to.be.rejected.then(() => {
       return promise.catch(err => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(422);
         expect(err.response.body).to.have.property('message');
+        return User.findOne({ where: { email: userParams.email } }).then(user => {
+          expect(user).to.be.null;
+        });
       });
     });
   });
@@ -335,6 +359,9 @@ describe('/admin/users POST', () => {
       expect(res).to.have.status(200);
       expect(res).to.be.a.json;
       dictum.chai(res, 'User Admin signup endpoint');
+      return User.findOne({ where: { email: res.body.email } }).then(user => {
+        expect(user).not.to.be.null;
+      });
     });
   });
 
@@ -361,6 +388,9 @@ describe('/admin/users POST', () => {
     return expect(promise).to.be.fulfilled.then(res => {
       expect(res).to.have.status(200);
       expect(res).to.be.a.json;
+      expect(res.body)
+        .to.have.property('admin')
+        .equals(true);
     });
   });
 
@@ -380,7 +410,7 @@ describe('/admin/users POST', () => {
           .send({
             name: 'Federico',
             surname: 'Casares',
-            email: 'federico.casares@wolox.com.ar',
+            email: 'federico.notadmin@wolox.com.ar',
             password: 'noImporta'
           });
       });
@@ -389,6 +419,9 @@ describe('/admin/users POST', () => {
         expect(err).not.to.be.null;
         expect(err.response).to.have.status(401);
         expect(err.response).to.be.a.json;
+        return User.findOne({ where: { email: 'federico.notadmin@wolox.com.ar' } }).then(user => {
+          expect(user.admin).to.be.equals(false);
+        });
       });
     });
   });
